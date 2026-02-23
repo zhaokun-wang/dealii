@@ -80,6 +80,13 @@ set(_separate_src
   mapping_q_eulerian.cc
   )
 
+if(DEAL_II_WITH_AGGLOMERATION)
+  list(APPEND _unity_include_src
+    fe_agglodgp.cc
+    mapping_box.cc
+  )
+endif()
+
 # determined by profiling
 set(_n_includes_per_unity_file 10)
 
@@ -147,6 +154,13 @@ set(_inst
   mapping_manifold.inst.in
   mapping_related_data.inst.in
   )
+
+if(DEAL_II_WITH_AGGLOMERATION)
+  list(APPEND _inst
+    fe_agglodgp.inst.in
+    mapping_box.inst.in
+  )
+endif()
 
 file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/fe/*.h

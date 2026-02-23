@@ -1,0 +1,4 @@
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class FE_AggloDGP<deal_II_dimension>;
+  }

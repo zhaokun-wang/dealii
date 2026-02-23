@@ -58,6 +58,12 @@ set(_separate_src
   tria.cc
   )
 
+if(DEAL_II_WITH_AGGLOMERATION)
+  list(APPEND _unity_include_src
+    agglomeration_handler.cc
+  )
+endif()
+
 # include all files in the unity file
 set(_n_includes_per_unity_file 20)
 
@@ -90,6 +96,12 @@ set(_inst
   tria.inst.in
   tria_objects.inst.in
   )
+
+if(DEAL_II_WITH_AGGLOMERATION)
+  list(APPEND _inst
+    agglomeration_handler.inst.in
+  )
+endif()
 
 file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
