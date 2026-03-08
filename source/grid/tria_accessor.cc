@@ -1685,6 +1685,8 @@ Point<structdim>
 TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   const Point<spacedim> &point) const
 {
+  Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
+
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
   for (const unsigned int v : this->vertex_indices())
@@ -2150,7 +2152,7 @@ types::material_id
 CellAccessor<dim, spacedim>::material_id() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id;
 }
@@ -2164,7 +2166,7 @@ CellAccessor<dim, spacedim>::set_material_id(
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   AssertIndexRange(mat_id, numbers::invalid_material_id);
-  this->tria->levels[this->present_level]
+  this->tria->levels[this->level()]
     ->cells.boundary_or_material_id[this->present_index]
     .material_id = mat_id;
 }
@@ -2193,7 +2195,7 @@ CellAccessor<dim, spacedim>::set_subdomain_id(
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert(this->is_active(),
          ExcMessage("set_subdomain_id() can only be called on active cells!"));
-  this->tria->levels[this->present_level]->subdomain_ids[this->present_index] =
+  this->tria->levels[this->level()]->subdomain_ids[this->present_index] =
     new_subdomain_id;
 }
 
@@ -2205,8 +2207,8 @@ CellAccessor<dim, spacedim>::set_level_subdomain_id(
   const types::subdomain_id new_level_subdomain_id) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]
-    ->level_subdomain_ids[this->present_index] = new_level_subdomain_id;
+  this->tria->levels[this->level()]->level_subdomain_ids[this->present_index] =
+    new_level_subdomain_id;
 }
 
 
@@ -2218,7 +2220,7 @@ CellAccessor<dim, spacedim>::direction_flag() const
   if constexpr (dim == spacedim)
     return true;
   else if constexpr (dim == spacedim - 1)
-    return this->tria->levels[this->present_level]
+    return this->tria->levels[this->level()]
       ->direction_flags[this->present_index];
   else
     {
@@ -2244,8 +2246,8 @@ CellAccessor<dim, spacedim>::set_direction_flag(
            ExcMessage("If dim==spacedim, direction flags are always true and "
                       "can not be set to anything else."));
   else if constexpr (dim == spacedim - 1)
-    this->tria->levels[this->present_level]
-      ->direction_flags[this->present_index] = new_direction_flag;
+    this->tria->levels[this->level()]->direction_flags[this->present_index] =
+      new_direction_flag;
   else
     Assert(new_direction_flag == true,
            ExcMessage("If dim<spacedim-1, then this function can be called "
@@ -2259,12 +2261,12 @@ void
 CellAccessor<dim, spacedim>::set_parent(const unsigned int parent_index)
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  Assert(this->level() > 0, TriaAccessorExceptions::ExcCellHasNoParent());
 
   // We only store the parent for every second cell. That's because cells are
   // created during refinement in multiples of two, and so two successive
   // cells always share the same parent.
-  this->tria->levels[this->present_level]->parents[this->present_index / 2] =
+  this->tria->levels[this->level()]->parents[this->present_index / 2] =
     parent_index;
 }
 
@@ -2274,13 +2276,12 @@ template <int dim, int spacedim>
 int
 CellAccessor<dim, spacedim>::parent_index() const
 {
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  Assert(this->level() > 0, TriaAccessorExceptions::ExcCellHasNoParent());
 
   // We only store the parent for every second cell. That's because cells are
   // created during refinement in multiples of two, and so two successive
   // cells always share the same parent.
-  return this->tria->levels[this->present_level]
-    ->parents[this->present_index / 2];
+  return this->tria->levels[this->level()]->parents[this->present_index / 2];
 }
 
 
@@ -2290,8 +2291,8 @@ void
 CellAccessor<dim, spacedim>::set_active_cell_index(
   const unsigned int active_cell_index) const
 {
-  this->tria->levels[this->present_level]
-    ->active_cell_indices[this->present_index] = active_cell_index;
+  this->tria->levels[this->level()]->active_cell_indices[this->present_index] =
+    active_cell_index;
 }
 
 
@@ -2301,7 +2302,7 @@ void
 CellAccessor<dim, spacedim>::set_global_active_cell_index(
   const types::global_cell_index index) const
 {
-  this->tria->levels[this->present_level]
+  this->tria->levels[this->level()]
     ->global_active_cell_indices[this->present_index] = index;
 }
 
@@ -2312,7 +2313,7 @@ void
 CellAccessor<dim, spacedim>::set_global_level_cell_index(
   const types::global_cell_index index) const
 {
-  this->tria->levels[this->present_level]
+  this->tria->levels[this->level()]
     ->global_level_cell_indices[this->present_index] = index;
 }
 
@@ -2323,9 +2324,9 @@ TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::parent() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+  Assert(this->level() > 0, TriaAccessorExceptions::ExcCellHasNoParent());
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
-                                              this->present_level - 1,
+                                              this->level() - 1,
                                               parent_index());
 
   return q;
@@ -2355,12 +2356,12 @@ CellAccessor<dim, spacedim>::set_neighbor(
   AssertIndexRange(i, this->n_faces());
 
   auto &neighbor =
-    this->tria->levels[this->present_level]
+    this->tria->levels[this->level()]
       ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() + i];
   if (pointer.state() == IteratorState::valid)
     {
-      neighbor.first  = pointer->present_level;
-      neighbor.second = pointer->present_index;
+      neighbor.first  = pointer->level();
+      neighbor.second = pointer->index();
     }
   else
     {

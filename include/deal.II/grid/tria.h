@@ -87,6 +87,7 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
+    template <int dim>
     class TriaFaces;
 
     class TriaObjects;
@@ -4491,8 +4492,8 @@ private:
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<
-    std::unique_ptr<dealii::internal::TriangulationImplementation::TriaLevel>>
+  std::vector<std::unique_ptr<
+    dealii::internal::TriangulationImplementation::TriaLevel<dim, spacedim>>>
     levels;
 
   /**
@@ -4500,7 +4501,7 @@ private:
    * in 2d it contains data concerning lines and in 3d quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces>
+  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces<dim>>
     faces;
 
 
@@ -4753,8 +4754,10 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   levels.resize(size);
   for (auto &level_ : levels)
     {
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel> level;
-      ar                                                               &level;
+      std::unique_ptr<
+        internal::TriangulationImplementation::TriaLevel<dim, spacedim>>
+          level;
+      ar &level;
       level_ = std::move(level);
     }
 

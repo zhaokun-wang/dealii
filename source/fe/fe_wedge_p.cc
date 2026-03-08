@@ -73,7 +73,7 @@ namespace
     else
       DEAL_II_NOT_IMPLEMENTED();
 
-    return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
+    return internal::expand<3>({{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
   }
 } // namespace
 
@@ -105,9 +105,9 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
 
   Assert(1 <= degree && degree <= 2, ExcNotImplemented());
 
-  FE_SimplexP<2> fe_triangle(degree);
-  FE_Q<1>        fe_line(degree);
-  FE_Q<2>        fe_quad(degree);
+  const FE_SimplexP<2> fe_triangle(degree);
+  const FE_Q<1>        fe_line(degree);
+  const FE_Q<2>        fe_quad(degree);
 
   for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
     {
