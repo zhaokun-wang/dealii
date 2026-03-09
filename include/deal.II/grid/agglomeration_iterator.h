@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) XXXX - YYYY by the polyDEAL authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
-// This file is part of the polyDEAL library.
+// This file is part of the deal.II library.
 //
-// Detailed license information governing the source code
-// can be found in LICENSE.md at the top level directory.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@
 #define agglomeration_iterator_h
 
 
-#include <deal.II/grid/agglomeration_accessor.h>
+#include <agglomeration_accessor.h>
 
 
 /**
@@ -60,7 +60,7 @@ public:
   operator*() const;
 
   /**
-   * Dereferencing operator, non-@p const version.
+   * Dereferencing operator, non- @p const version.
    */
   AgglomerationAccessor<dim, spacedim> &
   operator*();

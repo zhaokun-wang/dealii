@@ -48,6 +48,7 @@
 #
 # Components and miscellaneous options:
 #
+#     DEAL_II_WITH_AGGLOMERATION
 #     DEAL_II_WITH_64BIT_INDICES
 #     DEAL_II_WITH_COMPLEX_VALUES
 #     DEAL_II_WITH_CXX20_MODULE
@@ -344,6 +345,12 @@ unset(ENV{NVCCFLAGS})
 #                Components and miscellaneous setup:                   #
 #                                                                      #
 ########################################################################
+
+option(DEAL_II_WITH_AGGLOMERATION
+  "If set to ON, then enable support for Polytope Agglomeration methods"
+  OFF
+  )
+list(APPEND DEAL_II_FEATURES AGGLOMERATION)
 
 option(DEAL_II_WITH_64BIT_INDICES
   "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns."

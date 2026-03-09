@@ -1,16 +1,14 @@
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2002 - 2023 by the deal.II authors
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// Part of the source code is dual licensed under Apache-2.0 WITH
-// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
-// governing the source code and code contributions can be found in
-// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef dealii_fe_agglodgp_h
 #define dealii_fe_agglodgp_h
@@ -30,6 +28,13 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Discontinuous finite elements based on Legendre polynomials.
+ * 
+ * Unlike standard deal.II finite elements that are defined strictly on normal deal.II
+ * cells, this element is specifically designed to work on arbitrary agglomerated polytopes.
+ * It evaluates Legendre polynomial shape functions 
+ * defined on the bounding box of the polytopes instead of directly on the polytopes themselves, 
+ * allowing for discontinuous function spaces on complex, non-matching polygonal 
+ * or polyhedral meshes.
  *
  * This finite element implements complete polynomial spaces, that is,
  * dim-dimensional polynomials of degree p. For example, in 2d the element
@@ -399,12 +404,6 @@ public:
    * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to implement this function. They may only
-   * provide interpolation matrices for certain source finite elements, for
-   * example those from the same family. If they don't implement interpolation
-   * from a given element, then they must throw an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
@@ -415,12 +414,6 @@ public:
    * Return the matrix interpolating from a face of one element to the face
    * of the neighboring element. The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to implement this function. They may only
-   * provide interpolation matrices for certain source finite elements, for
-   * example those from the same family. If they don't implement interpolation
-   * from a given element, then they must throw an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
    */
   virtual void
   get_subface_interpolation_matrix(
@@ -456,6 +449,9 @@ public:
   virtual std::pair<Table<2, bool>, std::vector<unsigned int>>
   get_constant_modes() const override;
 
+  /**
+   * Return a pointer to the FE_AggloDGP object, required by deal.II finite element architecture.
+   */
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 

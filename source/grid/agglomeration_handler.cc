@@ -1343,6 +1343,6 @@ AgglomerationHandler<3>::create_agglomeration_sparsity_pattern(
   const AffineConstraints<double>   &constraints,
   const bool                         keep_constrained_dofs,
   const types::subdomain_id          subdomain_id);
-*/
 
+*/
 #endif

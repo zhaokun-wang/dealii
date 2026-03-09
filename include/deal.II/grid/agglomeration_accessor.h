@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) XXXX - YYYY by the polyDEAL authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
-// This file is part of the polyDEAL library.
+// This file is part of the deal.II library.
 //
-// Detailed license information governing the source code
-// can be found in LICENSE.md at the top level directory.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ class AgglomerationIterator;
 template <int, int> class AgglomerationHandler;
 
 /**
- * Accessor class used by AgglomerationIterator to access agglomeration data.
+ * Accessor interface class used by AgglomerationIterator to access agglomeration data of a specific polytopal stored in AgglomerationHandler class.
  */
 template <int dim, int spacedim = dim>
 class AgglomerationAccessor
@@ -56,8 +56,8 @@ public:
   get_dof_indices(std::vector<types::global_dof_index> &) const;
 
   /**
-   * Return, for a cell, the number of faces. In case the cell is a standard
-   * cell, then the number of faces is the classical one. If it's a master cell,
+   * Return, for a cell, the number of faces. In the case where the cell is a standard
+   * cell, the returned number of faces is the classical one. If it's a master cell,
    * then it returns the number of faces of the agglomeration identified by the
    * master cell itself.
    */
@@ -150,7 +150,8 @@ public:
   unsigned int
   n_background_cells() const;
 
-  /* Returns true if this polygon is owned by the current processor. On a serial
+  /** 
+   * Returns true if this polygon is owned by the current processor. On a serial
    * Triangulation this returs always true, but may yield false for a
    * parallel::distributed::Triangulation.
    */
@@ -208,7 +209,6 @@ private:
    */
   ~AgglomerationAccessor() = default;
 
-
   /**
    * The unique deal.II cell associated to the present polytope.
    */
@@ -265,6 +265,10 @@ private:
   const AgglomerationContainer &
   get_slaves() const;
 
+  /**
+   * If a master cell is given, return the number of faces of the whole polytope.
+   * If a normal deal.II cell is given, return the normal number of faces of the normal cell.
+   */
   unsigned int
   n_agglomerated_faces_per_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)

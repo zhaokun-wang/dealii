@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) XXXX - YYYY by the polyDEAL authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
-// This file is part of the polyDEAL library.
+// This file is part of the deal.II library.
 //
-// Detailed license information governing the source code
-// can be found in LICENSE.md at the top level directory.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
 
@@ -30,6 +30,12 @@ namespace dealii
 {
   namespace internal
   {
+    /**
+     * This struct implements the R-tree agglomeration based on `boost::geometry::index::detail::rtree::visitor` 
+     * interface. It traverses the spatial tree down to a specified `target_level`. 
+     * Once it reaches the target depth, it groups all underlying leaf nodes (which 
+     * correspond to standard deal.II active cells) into polytopes.
+     */
     template <typename Value,
               typename Options,
               typename Translator,
@@ -107,8 +113,9 @@ namespace dealii
       size_t node_counter;
 
       /**
-       * The level where children are living.
-       * Before: "we want to extract from the RTree object."
+       * The specific depth level within the R-tree to be extracted.
+       * All active cells that belong to the same R-tree node at this depth level
+       * are agglomerated into a single polytope.
        */
       const size_t target_level;
 
@@ -312,7 +319,8 @@ namespace dealii
 
     /**
      * Extract agglomerates based on the current tree and the extraction level.
-     * This function returns a reference to
+     * It groups all active cells that belong to the same R-tree node at the specified 
+     * @p target_level into a single agglomerated polytope.
      */
     const std::vector<
       std::vector<typename Triangulation<dim>::active_cell_iterator>> &

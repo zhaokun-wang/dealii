@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) XXXX - YYYY by the polyDEAL authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
-// This file is part of the polyDEAL library.
+// This file is part of the deal.II library.
 //
-// Detailed license information governing the source code
-// can be found in LICENSE.md at the top level directory.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
 
@@ -54,22 +54,22 @@
 #  include <EpetraExt_RowMatrixOut.h>
 #endif
 
-#ifdef DEAL_II_WITH_CGAL
+// #ifdef DEAL_II_WITH_CGAL
 
-#  include <CGAL/Constrained_Delaunay_triangulation_2.h>
-#  include <CGAL/Constrained_triangulation_plus_2.h>
-#  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
-#  include <CGAL/Polygon_2.h>
-#  include <CGAL/Polygon_with_holes_2.h>
-#  include <CGAL/Segment_Delaunay_graph_2.h>
-#  include <CGAL/Segment_Delaunay_graph_traits_2.h>
-#  include <CGAL/intersections.h>
-#  include <CGAL/squared_distance_2.h>
-#  include <CGAL/squared_distance_3.h>
+// #  include <CGAL/Constrained_Delaunay_triangulation_2.h>
+// #  include <CGAL/Constrained_triangulation_plus_2.h>
+// #  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+// #  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
+// #  include <CGAL/Polygon_2.h>
+// #  include <CGAL/Polygon_with_holes_2.h>
+// #  include <CGAL/Segment_Delaunay_graph_2.h>
+// #  include <CGAL/Segment_Delaunay_graph_traits_2.h>
+// #  include <CGAL/intersections.h>
+// #  include <CGAL/squared_distance_2.h>
+// #  include <CGAL/squared_distance_3.h>
 
 
-#endif
+// #endif
 
 #include <memory>
 
@@ -141,260 +141,259 @@ namespace dealii::PolyUtils::internal
 
 namespace dealii::PolyUtils
 {
-  template <typename Value,
-            typename Options,
-            typename Translator,
-            typename Box,
-            typename Allocators>
-  struct Rtree_visitor : public boost::geometry::index::detail::rtree::visitor<
-                           Value,
-                           typename Options::parameters_type,
-                           Box,
-                           Allocators,
-                           typename Options::node_tag,
-                           true>::type
-  {
-    inline Rtree_visitor(
-      const Translator &translator,
-      unsigned int      target_level,
-      std::vector<std::vector<typename Triangulation<
-        boost::geometry::dimension<Box>::value>::active_cell_iterator>> &boxes,
-      std::vector<std::vector<unsigned int>>                            &csr);
+  // template <typename Value,
+  //           typename Options,
+  //           typename Translator,
+  //           typename Box,
+  //           typename Allocators>
+  // struct Rtree_visitor : public boost::geometry::index::detail::rtree::visitor<
+  //                          Value,
+  //                          typename Options::parameters_type,
+  //                          Box,
+  //                          Allocators,
+  //                          typename Options::node_tag,
+  //                          true>::type
+  // {
+  //   inline Rtree_visitor(
+  //     const Translator &translator,
+  //     unsigned int      target_level,
+  //     std::vector<std::vector<typename Triangulation<
+  //       boost::geometry::dimension<Box>::value>::active_cell_iterator>> &boxes,
+  //     std::vector<std::vector<unsigned int>>                            &csr);
 
 
-    /**
-     * An alias that identifies an InternalNode of the tree.
-     */
-    using InternalNode =
-      typename boost::geometry::index::detail::rtree::internal_node<
-        Value,
-        typename Options::parameters_type,
-        Box,
-        Allocators,
-        typename Options::node_tag>::type;
+  //   /**
+  //    * An alias that identifies an InternalNode of the tree.
+  //    */
+  //   using InternalNode =
+  //     typename boost::geometry::index::detail::rtree::internal_node<
+  //       Value,
+  //       typename Options::parameters_type,
+  //       Box,
+  //       Allocators,
+  //       typename Options::node_tag>::type;
 
-    /**
-     * An alias that identifies a Leaf of the tree.
-     */
-    using Leaf = typename boost::geometry::index::detail::rtree::leaf<
-      Value,
-      typename Options::parameters_type,
-      Box,
-      Allocators,
-      typename Options::node_tag>::type;
+  //   /**
+  //    * An alias that identifies a Leaf of the tree.
+  //    */
+  //   using Leaf = typename boost::geometry::index::detail::rtree::leaf<
+  //     Value,
+  //     typename Options::parameters_type,
+  //     Box,
+  //     Allocators,
+  //     typename Options::node_tag>::type;
 
-    /**
-     * Implements the visitor interface for InternalNode objects. If the node
-     * belongs to the level next to @p target_level, then fill the bounding box vector for that node.
-     */
-    inline void
-    operator()(const InternalNode &node);
+  //   /**
+  //    * Implements the visitor interface for InternalNode objects. If the node
+  //    * belongs to the level next to @p target_level, then fill the bounding box vector for that node.
+  //    */
+  //   inline void
+  //   operator()(const InternalNode &node);
 
-    /**
-     * Implements the visitor interface for Leaf objects.
-     */
-    inline void
-    operator()(const Leaf &);
+  //   /**
+  //    * Implements the visitor interface for Leaf objects.
+  //    */
+  //   inline void
+  //   operator()(const Leaf &);
 
-    /**
-     * Translator interface, required by the boost implementation of the rtree.
-     */
-    const Translator &translator;
+  //   /**
+  //    * Translator interface, required by the boost implementation of the rtree.
+  //    */
+  //   const Translator &translator;
 
-    /**
-     * Store the level we are currently visiting.
-     */
-    size_t level;
+  //   /**
+  //    * Store the level we are currently visiting.
+  //    */
+  //   size_t level;
 
-    /**
-     * Index used to keep track of the number of different visited nodes during
-     * recursion/
-     */
-    size_t node_counter;
+  //   /**
+  //    * Index used to keep track of the number of different visited nodes during
+  //    * recursion/
+  //    */
+  //   size_t node_counter;
 
-    size_t next_level_leafs_processed;
-    /**
-     * The level where children are living.
-     * Before: "we want to extract from the RTree object."
-     */
-    const size_t target_level;
+  //   size_t next_level_leafs_processed;
+  //   /**
+  //    * The level where children are living.
+  //    * Before: "we want to extract from the RTree object."
+  //    */
+  //   const size_t target_level;
 
-    /**
-     * A reference to the input vector of vector of BoundingBox objects. This
-     * vector v has the following property: v[i] = vector with all
-     * of the BoundingBox bounded by the i-th node of the Rtree.
-     */
-    std::vector<std::vector<typename Triangulation<
-      boost::geometry::dimension<Box>::value>::active_cell_iterator>>
-      &agglomerates;
+  //   /**
+  //    * A reference to the input vector of vector of BoundingBox objects. This
+  //    * vector v has the following property: v[i] = vector with all
+  //    * of the BoundingBox bounded by the i-th node of the Rtree.
+  //    */
+  //   std::vector<std::vector<typename Triangulation<
+  //     boost::geometry::dimension<Box>::value>::active_cell_iterator>>
+  //     &agglomerates;
 
-    std::vector<std::vector<unsigned int>> &row_ptr;
-  };
-
-
-
-  template <typename Value,
-            typename Options,
-            typename Translator,
-            typename Box,
-            typename Allocators>
-  Rtree_visitor<Value, Options, Translator, Box, Allocators>::Rtree_visitor(
-    const Translator  &translator,
-    const unsigned int target_level,
-    std::vector<std::vector<typename Triangulation<
-      boost::geometry::dimension<Box>::value>::active_cell_iterator>>
-                                           &bb_in_boxes,
-    std::vector<std::vector<unsigned int>> &csr)
-    : translator(translator)
-    , level(0)
-    , node_counter(0)
-    , next_level_leafs_processed(0)
-    , target_level(target_level)
-    , agglomerates(bb_in_boxes)
-    , row_ptr(csr)
-  {}
+  //   std::vector<std::vector<unsigned int>> &row_ptr;
+  // };
 
 
 
-  template <typename Value,
-            typename Options,
-            typename Translator,
-            typename Box,
-            typename Allocators>
-  void
-  Rtree_visitor<Value, Options, Translator, Box, Allocators>::operator()(
-    const Rtree_visitor::InternalNode &node)
-  {
-    using elements_type =
-      typename boost::geometry::index::detail::rtree::elements_type<
-        InternalNode>::type; //  pairs of bounding box and pointer to child node
-    const elements_type &elements =
-      boost::geometry::index::detail::rtree::elements(node);
-
-    if (level < target_level)
-      {
-        size_t level_backup = level;
-        ++level;
-
-        for (typename elements_type::const_iterator it = elements.begin();
-             it != elements.end();
-             ++it)
-          {
-            boost::geometry::index::detail::rtree::apply_visitor(*this,
-                                                                 *it->second);
-          }
-
-        level = level_backup;
-      }
-    else if (level == target_level)
-      {
-        // const unsigned int n_children = elements.size();
-        const auto offset = agglomerates.size();
-        agglomerates.resize(offset + 1);
-        row_ptr.resize(row_ptr.size() + 1);
-        next_level_leafs_processed = 0;
-        row_ptr.back().push_back(
-          next_level_leafs_processed); // convention: row_ptr[0]=0
-        size_t level_backup = level;
-
-        ++level;
-        for (const auto &child : elements)
-          {
-            boost::geometry::index::detail::rtree::apply_visitor(*this,
-                                                                 *child.second);
-          }
-        // Done with node number 'node_counter'
-
-        ++node_counter; // visited all children of an internal node
-
-        level = level_backup;
-      }
-    else if (level > target_level)
-      {
-        // Keep visiting until you go to the leafs.
-        size_t level_backup = level;
-
-        ++level;
-
-        for (const auto &child : elements)
-          {
-            boost::geometry::index::detail::rtree::apply_visitor(*this,
-                                                                 *child.second);
-          }
-        level = level_backup;
-        row_ptr[node_counter].push_back(next_level_leafs_processed);
-      }
-  }
+  // template <typename Value,
+  //           typename Options,
+  //           typename Translator,
+  //           typename Box,
+  //           typename Allocators>
+  // Rtree_visitor<Value, Options, Translator, Box, Allocators>::Rtree_visitor(
+  //   const Translator  &translator,
+  //   const unsigned int target_level,
+  //   std::vector<std::vector<typename Triangulation<
+  //     boost::geometry::dimension<Box>::value>::active_cell_iterator>>
+  //                                          &bb_in_boxes,
+  //   std::vector<std::vector<unsigned int>> &csr)
+  //   : translator(translator)
+  //   , level(0)
+  //   , node_counter(0)
+  //   , next_level_leafs_processed(0)
+  //   , target_level(target_level)
+  //   , agglomerates(bb_in_boxes)
+  //   , row_ptr(csr)
+  // {}
 
 
 
-  template <typename Value,
-            typename Options,
-            typename Translator,
-            typename Box,
-            typename Allocators>
-  void
-  Rtree_visitor<Value, Options, Translator, Box, Allocators>::operator()(
-    const Rtree_visitor::Leaf &leaf)
-  {
-    using elements_type =
-      typename boost::geometry::index::detail::rtree::elements_type<
-        Leaf>::type; //  pairs of bounding box and pointer to child node
-    const elements_type &elements =
-      boost::geometry::index::detail::rtree::elements(leaf);
+  // template <typename Value,
+  //           typename Options,
+  //           typename Translator,
+  //           typename Box,
+  //           typename Allocators>
+  // void
+  // Rtree_visitor<Value, Options, Translator, Box, Allocators>::operator()(
+  //   const Rtree_visitor::InternalNode &node)
+  // {
+  //   using elements_type =
+  //     typename boost::geometry::index::detail::rtree::elements_type<
+  //       InternalNode>::type; //  pairs of bounding box and pointer to child node
+  //   const elements_type &elements =
+  //     boost::geometry::index::detail::rtree::elements(node);
+
+  //   if (level < target_level)
+  //     {
+  //       size_t level_backup = level;
+  //       ++level;
+
+  //       for (typename elements_type::const_iterator it = elements.begin();
+  //            it != elements.end();
+  //            ++it)
+  //         {
+  //           boost::geometry::index::detail::rtree::apply_visitor(*this,
+  //                                                                *it->second);
+  //         }
+
+  //       level = level_backup;
+  //     }
+  //   else if (level == target_level)
+  //     {
+  //       // const unsigned int n_children = elements.size();
+  //       const auto offset = agglomerates.size();
+  //       agglomerates.resize(offset + 1);
+  //       row_ptr.resize(row_ptr.size() + 1);
+  //       next_level_leafs_processed = 0;
+  //       row_ptr.back().push_back(
+  //         next_level_leafs_processed); // convention: row_ptr[0]=0
+  //       size_t level_backup = level;
+
+  //       ++level;
+  //       for (const auto &child : elements)
+  //         {
+  //           boost::geometry::index::detail::rtree::apply_visitor(*this,
+  //                                                                *child.second);
+  //         }
+  //       // Done with node number 'node_counter'
+
+  //       ++node_counter; // visited all children of an internal node
+
+  //       level = level_backup;
+  //     }
+  //   else if (level > target_level)
+  //     {
+  //       // Keep visiting until you go to the leafs.
+  //       size_t level_backup = level;
+
+  //       ++level;
+
+  //       for (const auto &child : elements)
+  //         {
+  //           boost::geometry::index::detail::rtree::apply_visitor(*this,
+  //                                                                *child.second);
+  //         }
+  //       level = level_backup;
+  //       row_ptr[node_counter].push_back(next_level_leafs_processed);
+  //     }
+  // }
 
 
-    for (const auto &it : elements)
-      {
-        agglomerates[node_counter].push_back(it.second);
-      }
-    next_level_leafs_processed += elements.size();
-  }
 
-  template <typename Rtree>
-  inline std::pair<
-    std::vector<std::vector<unsigned int>>,
-    std::vector<std::vector<typename Triangulation<boost::geometry::dimension<
-      typename Rtree::indexable_type>::value>::active_cell_iterator>>>
-  extract_children_of_level(const Rtree &tree, const unsigned int level)
-  {
-    using RtreeView =
-      boost::geometry::index::detail::rtree::utilities::view<Rtree>;
-    RtreeView rtv(tree);
+  // template <typename Value,
+  //           typename Options,
+  //           typename Translator,
+  //           typename Box,
+  //           typename Allocators>
+  // void
+  // Rtree_visitor<Value, Options, Translator, Box, Allocators>::operator()(
+  //   const Rtree_visitor::Leaf &leaf)
+  // {
+  //   using elements_type =
+  //     typename boost::geometry::index::detail::rtree::elements_type<
+  //       Leaf>::type; //  pairs of bounding box and pointer to child node
+  //   const elements_type &elements =
+  //     boost::geometry::index::detail::rtree::elements(leaf);
 
-    std::vector<std::vector<unsigned int>> csrs;
-    std::vector<std::vector<typename Triangulation<boost::geometry::dimension<
-      typename Rtree::indexable_type>::value>::active_cell_iterator>>
-      agglomerates;
 
-    if (rtv.depth() == 0)
-      {
-        // The below algorithm does not work for `rtv.depth()==0`, which might
-        // happen if the number entries in the tree is too small.
-        // In this case, simply return a single bounding box.
-        agglomerates.resize(1);
-        agglomerates[0].resize(1);
-        csrs.resize(1);
-        csrs[0].resize(1);
-      }
-    else
-      {
-        const unsigned int target_level =
-          std::min<unsigned int>(level, rtv.depth());
+  //   for (const auto &it : elements)
+  //     {
+  //       agglomerates[node_counter].push_back(it.second);
+  //     }
+  //   next_level_leafs_processed += elements.size();
+  // }
 
-        Rtree_visitor<typename RtreeView::value_type,
-                      typename RtreeView::options_type,
-                      typename RtreeView::translator_type,
-                      typename RtreeView::box_type,
-                      typename RtreeView::allocators_type>
-          node_visitor(rtv.translator(), target_level, agglomerates, csrs);
-        rtv.apply_visitor(node_visitor);
-      }
-    AssertDimension(agglomerates.size(), csrs.size());
+  // template <typename Rtree>
+  // inline std::pair<
+  //   std::vector<std::vector<unsigned int>>,
+  //   std::vector<std::vector<typename Triangulation<boost::geometry::dimension<
+  //     typename Rtree::indexable_type>::value>::active_cell_iterator>>>
+  // extract_children_of_level(const Rtree &tree, const unsigned int level)
+  // {
+  //   using RtreeView =
+  //     boost::geometry::index::detail::rtree::utilities::view<Rtree>;
+  //   RtreeView rtv(tree);
 
-    return {csrs, agglomerates};
-  }
+  //   std::vector<std::vector<unsigned int>> csrs;
+  //   std::vector<std::vector<typename Triangulation<boost::geometry::dimension<
+  //     typename Rtree::indexable_type>::value>::active_cell_iterator>>
+  //     agglomerates;
 
+  //   if (rtv.depth() == 0)
+  //     {
+  //       // The below algorithm does not work for `rtv.depth()==0`, which might
+  //       // happen if the number entries in the tree is too small.
+  //       // In this case, simply return a single bounding box.
+  //       agglomerates.resize(1);
+  //       agglomerates[0].resize(1);
+  //       csrs.resize(1);
+  //       csrs[0].resize(1);
+  //     }
+  //   else
+  //     {
+  //       const unsigned int target_level =
+  //         std::min<unsigned int>(level, rtv.depth());
+
+  //       Rtree_visitor<typename RtreeView::value_type,
+  //                     typename RtreeView::options_type,
+  //                     typename RtreeView::translator_type,
+  //                     typename RtreeView::box_type,
+  //                     typename RtreeView::allocators_type>
+  //         node_visitor(rtv.translator(), target_level, agglomerates, csrs);
+  //       rtv.apply_visitor(node_visitor);
+  //     }
+  //   AssertDimension(agglomerates.size(), csrs.size());
+
+  //   return {csrs, agglomerates};
+  // }
 
   /*template <int dim, typename Number = double>
   Number
@@ -546,11 +545,11 @@ namespace dealii::PolyUtils
    *
    * @note The given triangulation must be a parallel::fullydistributed::Triangulation. This is
    * required as the partitions generated by p4est, the partitioner for
-   * parallell::distributed::Triangulation, can generate discontinuous
+   * parallell::distributed::Triangulation, which can generate discontinuous
    * partitions which are not supported by the METIS partitioner.
    *
    */
-  /*template <int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   partition_locally_owned_regions(const unsigned int            n_partitions,
                                   Triangulation<dim, spacedim> &triangulation,
@@ -612,7 +611,7 @@ namespace dealii::PolyUtils
         cell->set_material_id(
           partition_indices[internal::get_index(locally_owned_cells,
                                                 cell->active_cell_index())]);
-  }*/
+  }
 
 
 
@@ -622,11 +621,11 @@ namespace dealii::PolyUtils
    *
    * @note The given triangulation must be a parallel::fullydistributed::Triangulation. This is
    * required as the partitions generated by p4est, the partitioner for
-   * parallell::distributed::Triangulation, can generate discontinuous
+   * parallell::distributed::Triangulation, which can generate discontinuous
    * partitions which are not supported by the METIS partitioner.
    *
    */
-  /*template <int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   partition_locally_owned_regions(
     AgglomerationHandler<dim>       &agglomeration_handler,
@@ -701,7 +700,7 @@ namespace dealii::PolyUtils
     // All the cells with the same partition index will be merged together.
     for (unsigned int i = 0; i < n_partitions; ++i)
       agglomeration_handler.define_agglomerate(cells_per_partion_id[i]);
-  }*/
+  }
 
 
 
@@ -890,7 +889,9 @@ namespace dealii::PolyUtils
     myfile.close();
   }
 
-
+  /**
+   * Return a compile-time constant required for passing max_elem_per_node in R-tree initialization.
+   */
   template <typename T>
   inline constexpr T
   constexpr_pow(T num, unsigned int pow)

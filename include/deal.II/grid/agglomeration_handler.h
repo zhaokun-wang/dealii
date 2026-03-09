@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) XXXX - YYYY by the polyDEAL authors
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
-// This file is part of the polyDEAL library.
+// This file is part of the deal.II library.
 //
-// Detailed license information governing the source code
-// can be found in LICENSE.md at the top level directory.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
 #ifndef agglomeration_handler_h
@@ -49,9 +49,9 @@
 #include <deal.II/non_matching/fe_immersed_values.h>
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
-#include <deal.II/grid/agglomeration_iterator.h>
-#include <deal.II/grid/agglomerator.h>
-#include <deal.II/fe/mapping_box.h>
+#include <agglomeration_iterator.h>
+#include <agglomerator.h>
+#include <mapping_box.h>
 
 #include <fstream>
 
@@ -165,7 +165,7 @@ namespace dealii
 
 
 /**
- * #TODO: Documentation.
+ * The Handler class that stores all the data used in the agglomeration.
  */
 template <int dim, int spacedim = dim>
 class AgglomerationHandler : public Subscriptor
@@ -176,7 +176,9 @@ public:
   using AgglomerationContainer =
     typename AgglomerationIterator<dim, spacedim>::AgglomerationContainer;
 
-
+  /**
+   * Enumeration for type of cells used in master_slave_relationships
+   */
   enum CellAgglomerationType
   {
     master = 0,
@@ -197,25 +199,25 @@ public:
   }
 
   /**
-   * Iterator to the first polytope.
+   * Iterator to the first polytope element of const object.
    */
   agglomeration_iterator
   begin() const;
 
   /**
-   * Iterator to the first polytope.
+   * Iterator to the first polytope element.
    */
   agglomeration_iterator
   begin();
 
   /**
-   * Iterator to one past the last polygonal element.
+   * Iterator to one after the last polygonal element of const object.
    */
   agglomeration_iterator
   end() const;
 
   /**
-   * Iterator to one past the last polygonal element.
+   * Iterator to one after the last polygonal element.
    */
   agglomeration_iterator
   end();
@@ -285,24 +287,39 @@ public:
 
   /**
    * Same as above, but checking that every vector of cells is connected. If
-   * not, each connected component is agglomerated by calling the
+   * not, each connected component is agglomerated by part by calling the
    * define_agglomerate() function defined above.
    */
-  //void
-  //define_agglomerate_with_check(const AgglomerationContainer &cells);
+  void
+  define_agglomerate_with_check(const AgglomerationContainer &cells);
 
+  /**
+   * Returns a constant reference of the Triangulation of the calling agglomeration.
+   */
   inline const Triangulation<dim, spacedim> &
   get_triangulation() const;
 
+  /**
+   * Returns a constant reference of the FiniteElement of the calling agglomeration.
+   */
   inline const FiniteElement<dim, spacedim> &
   get_fe() const;
 
+  /**
+   * Returns the default mapping used when initialize the mesh
+   */
   inline const Mapping<dim> &
   get_mapping() const;
 
+  /**
+   * Returns the mapping of bounding box used in agglomeration
+   */
   inline const MappingBox<dim> &
   get_agglomeration_mapping() const;
 
+  /**
+   * Return the vector of bounding box of the polytope
+   */
   inline const std::vector<BoundingBox<dim>> &
   get_local_bboxes() const;
 
@@ -313,11 +330,18 @@ public:
   //double
   //get_mesh_size() const;
 
+  /**
+   * Given a master cell, return the index of the related polytope
+   */
   inline types::global_cell_index
   cell_to_polytope_index(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     const;
 
+  /**
+   * Return a map between the pair of index of two adjacent polytopes and the vector of
+   * cell and interface id that constructs this interface, which represents a interface between two polytopes
+   */
   inline decltype(auto)
   get_interface() const;
 
@@ -336,22 +360,14 @@ public:
     typename Triangulation<dim, spacedim>::active_cell_iterator> &
   get_slaves_of_idx(types::global_cell_index idx) const;
 
-
+  /**
+   * Return the vector that stores the correspondence of master and slave cells.
+   * The vector has two kinds of elements, if the cell corresponds to the index i is a master cell,
+   * the ith vector element is -1; if it's a slave cell, the ith vector element is the
+   * index of the master cell of the polytope it belongs to.
+   */
   inline const LinearAlgebra::distributed::Vector<float> &
   get_relationships() const;
-
-  /**
-   * TODO: remove this in favour of the accessor version.
-   *
-   * @param master_cell
-   * @return std::vector<
-   * typename Triangulation<dim, spacedim>::active_cell_iterator>
-   */
-  inline std::vector<
-    typename Triangulation<dim, spacedim>::active_cell_iterator>
-  get_agglomerate(
-    const typename Triangulation<dim, spacedim>::active_cell_iterator
-      &master_cell) const;
 
   /**
    * Display the indices of the vector identifying which cell is agglomerated
@@ -407,7 +423,7 @@ public:
 
   /**
    *
-   * Return a pair of FEValuesBase object reinited from the two sides of the
+   * Return a pair of FEValuesBase object reinited from the two component polytopes of the
    * agglomeration.
    */
   std::pair<const FEValuesBase<dim, spacedim> &,
@@ -419,8 +435,8 @@ public:
 
   /**
    * Return the agglomerated quadrature for the given agglomeration. This
-   * amounts to loop over all cells in an agglomeration and collecting together
-   * all the rules.
+   * amounts to looping over all cells in an agglomeration, collecting together
+   * all the rules, and mapping the quadrature points to the reference unit of bounding box.
    */
   Quadrature<dim>
   agglomerated_quadrature(
@@ -434,25 +450,31 @@ public:
    * This function generalizes the behaviour of cell->face(f)->at_boundary()
    * in the case where f is an index out of the range [0,..., n_faces).
    * In practice, if you call this function with a standard deal.II cell, you
-   * have precisely the same result as calling cell->face(f)->at_boundary().
-   * Otherwise, if the cell is a master one, you have a boolean returning true
-   * is that face for the agglomeration is on the boundary or not.
+   * have exactly the same result as calling cell->face(f)->at_boundary().
+   * Otherwise, if the cell is a master one, it returns a boolean showing 
+   * whether that face of the agglomeration is on the boundary or not.
    */
   inline bool
   at_boundary(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              f) const;
 
+  /**
+   * Return the number of degrees of freedom per cell.
+   */
   inline unsigned int
   n_dofs_per_cell() const noexcept;
 
+  /**
+   * Return the number of degrees of the whole mesh
+   */
   inline types::global_dof_index
   n_dofs() const noexcept;
 
 
 
   /**
-   * Return the collection of vertices describing the boundary of the polytope
+   * Return the collection of boundary faces describing the boundary of the polytope
    * associated to the master cell `cell`. The return type is meant to describe
    * a sequence of edges (in 2D) or faces (in 3D).
    */
@@ -484,34 +506,13 @@ public:
   void
   setup_ghost_polytopes();
 
+  /**
+   * This function collects all the information needed for discontinuous galerkin method,
+   * and exchanges the information with all the interfaces of the neighbor polytope in different MPI ranks.
+   * The relevant data is declared in the downside private part, from qpoints to gradients.
+   */
   void
   exchange_interface_values();
-
-  // TODO: move it to private interface
-  mutable std::map<
-    types::subdomain_id,
-    std::map<std::pair<CellId, unsigned int>, std::vector<Point<spacedim>>>>
-    recv_qpoints;
-
-  mutable std::map<
-    types::subdomain_id,
-    std::map<std::pair<CellId, unsigned int>, std::vector<double>>>
-    recv_jxws;
-
-  mutable std::map<
-    types::subdomain_id,
-    std::map<std::pair<CellId, unsigned int>, std::vector<Tensor<1, spacedim>>>>
-    recv_normals;
-
-  mutable std::map<
-    types::subdomain_id,
-    std::map<std::pair<CellId, unsigned int>, std::vector<std::vector<double>>>>
-    recv_values;
-
-  mutable std::map<types::subdomain_id,
-                   std::map<std::pair<CellId, unsigned int>,
-                            std::vector<std::vector<Tensor<1, spacedim>>>>>
-    recv_gradients;
 
   /**
    * Given the index of a polytopic element, return a DoFHandler iterator
@@ -534,12 +535,6 @@ private:
   void
   initialize_agglomeration_data(
     const std::unique_ptr<GridTools::Cache<dim, spacedim>> &cache_tria);
-
-  void
-  update_agglomerate(
-    AgglomerationContainer &polytope,
-    const typename Triangulation<dim, spacedim>::active_cell_iterator
-      &master_cell);
 
   /**
    * Reinitialize the agglomeration data.
@@ -570,7 +565,9 @@ private:
   void
   create_bounding_box(const AgglomerationContainer &polytope);
 
-
+  /**
+   * Return the master index of the polytope this cell belongs to.
+   */
   inline types::global_cell_index
   get_master_idx_of_cell(
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
@@ -641,7 +638,7 @@ private:
   LinearAlgebra::distributed::Vector<float> master_slave_relationships;
 
   /**
-   *  Same as the one above, but storing cell iterators rather than indices.
+   * Same as the one above, but storing cell iterators rather than indices.
    *
    */
   std::map<types::global_cell_index,
@@ -650,6 +647,9 @@ private:
 
   using ScratchData = MeshWorker::ScratchData<dim, spacedim>;
 
+  /**
+   * Vector that stores how many faces the ith polytope has.
+   */
   mutable std::vector<types::global_cell_index> number_of_agglomerated_faces;
 
   /**
@@ -733,11 +733,21 @@ private:
     std::map<std::pair<CellId, unsigned int>, std::vector<Point<spacedim>>>>
     local_qpoints;
 
+  mutable std::map<
+    types::subdomain_id,
+    std::map<std::pair<CellId, unsigned int>, std::vector<Point<spacedim>>>>
+    recv_qpoints;
+
   // Exchange jxws
   mutable std::map<
     types::subdomain_id,
     std::map<std::pair<CellId, unsigned int>, std::vector<double>>>
     local_jxws;
+
+  mutable std::map<
+    types::subdomain_id,
+    std::map<std::pair<CellId, unsigned int>, std::vector<double>>>
+    recv_jxws;
 
   // Exchange normals
   mutable std::map<
@@ -745,18 +755,32 @@ private:
     std::map<std::pair<CellId, unsigned int>, std::vector<Tensor<1, spacedim>>>>
     local_normals;
 
+  mutable std::map<
+    types::subdomain_id,
+    std::map<std::pair<CellId, unsigned int>, std::vector<Tensor<1, spacedim>>>>
+    recv_normals;
+
   // Exchange values
   mutable std::map<
     types::subdomain_id,
     std::map<std::pair<CellId, unsigned int>, std::vector<std::vector<double>>>>
     local_values;
 
+  mutable std::map<
+    types::subdomain_id,
+    std::map<std::pair<CellId, unsigned int>, std::vector<std::vector<double>>>>
+    recv_values;
+
+  // Exchange gradients
   mutable std::map<types::subdomain_id,
                    std::map<std::pair<CellId, unsigned int>,
                             std::vector<std::vector<Tensor<1, spacedim>>>>>
     local_gradients;
 
-
+  mutable std::map<types::subdomain_id,
+                   std::map<std::pair<CellId, unsigned int>,
+                            std::vector<std::vector<Tensor<1, spacedim>>>>>
+    recv_gradients;
 
   ////////////////////////////////////////////////////////
 
@@ -793,7 +817,12 @@ private:
    */
   mutable std::unique_ptr<ScratchData> agglomerated_scratch;
 
-
+  /**
+   * Pointer for Immersed Surface Values on non-matching agglomerations.
+   * These unique_ptrs cache the FEValues-like objects needed to compute shape 
+   * functions and gradients within the polytope, across internal interfaces, 
+   * and on physical boundaries.
+   */
   mutable std::unique_ptr<NonMatching::FEImmersedSurfaceValues<spacedim>>
     agglomerated_isv;
 
@@ -803,31 +832,48 @@ private:
   mutable std::unique_ptr<NonMatching::FEImmersedSurfaceValues<spacedim>>
     agglomerated_isv_bdary;
 
+  /**
+   * Listens for mesh modifications to automatically invalidate and rebuild the agglomeration caches.
+   */
   boost::signals2::connection tria_listener;
 
+  /**
+   * Mandatory internal flags required by the handler for cell evaluation.
+   */
   UpdateFlags agglomeration_flags;
 
   const UpdateFlags internal_agglomeration_flags =
     update_values | update_gradients | update_JxW_values |
     update_quadrature_points;
 
+  /**
+   * Update flags for face/interface FE evaluation.
+   */
   UpdateFlags agglomeration_face_flags;
 
   const UpdateFlags internal_agglomeration_face_flags =
     update_quadrature_points | update_normal_vectors | update_values |
     update_gradients | update_JxW_values | update_inverse_jacobians;
 
+  /**
+   * Quadrature for current polytope/polytopal face. 
+   */
   Quadrature<dim> agglomeration_quad;
 
   Quadrature<dim - 1> agglomeration_face_quad;
 
-  // Associate the master cell to the slaves.
+  /**
+   * Maps the global active cell index of a master cell to a vector containing 
+   * the active cell iterators of all its constituent slave cells.
+   */
   std::unordered_map<
     types::global_cell_index,
     std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
     master2slaves;
 
-  // Map the master cell index with the polytope index
+  /**
+   * Map the master cell index with the polytope index.
+   */
   std::map<types::global_cell_index, types::global_cell_index> master2polygon;
 
 
@@ -835,7 +881,6 @@ private:
     master_disconnected;
 
   // Dummy FiniteElement objects needed only to generate quadratures
-
   /**
    * Dummy FE_Nothing
    */
@@ -884,16 +929,12 @@ AgglomerationHandler<dim, spacedim>::get_fe() const
   return *fe;
 }
 
-
-
 template <int dim, int spacedim>
 inline const Mapping<dim> &
 AgglomerationHandler<dim, spacedim>::get_mapping() const
 {
   return *mapping;
 }
-
-
 
 template <int dim, int spacedim>
 inline const MappingBox<dim> &
@@ -902,8 +943,6 @@ AgglomerationHandler<dim, spacedim>::get_agglomeration_mapping() const
   return *box_mapping;
 }
 
-
-
 template <int dim, int spacedim>
 inline const Triangulation<dim, spacedim> &
 AgglomerationHandler<dim, spacedim>::get_triangulation() const
@@ -911,15 +950,12 @@ AgglomerationHandler<dim, spacedim>::get_triangulation() const
   return *tria;
 }
 
-
 template <int dim, int spacedim>
 inline const std::vector<BoundingBox<dim>> &
 AgglomerationHandler<dim, spacedim>::get_local_bboxes() const
 {
   return bboxes;
 }
-
-
 
 template <int dim, int spacedim>
 inline types::global_cell_index
@@ -929,16 +965,12 @@ AgglomerationHandler<dim, spacedim>::cell_to_polytope_index(
   return master2polygon.at(cell->active_cell_index());
 }
 
-
-
 template <int dim, int spacedim>
 inline decltype(auto)
 AgglomerationHandler<dim, spacedim>::get_interface() const
 {
   return polytope_cache.interface;
 }
-
-
 
 template <int dim, int spacedim>
 inline const LinearAlgebra::distributed::Vector<float> &
@@ -947,30 +979,12 @@ AgglomerationHandler<dim, spacedim>::get_relationships() const
   return master_slave_relationships;
 }
 
-
-
-template <int dim, int spacedim>
-inline std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>
-AgglomerationHandler<dim, spacedim>::get_agglomerate(
-  const typename Triangulation<dim, spacedim>::active_cell_iterator
-    &master_cell) const
-{
-  Assert(is_master_cell(master_cell), ExcInternalError());
-  auto agglomeration = get_slaves_of_idx(master_cell->active_cell_index());
-  agglomeration.push_back(master_cell);
-  return agglomeration;
-}
-
-
-
 template <int dim, int spacedim>
 inline const DoFHandler<dim, spacedim> &
 AgglomerationHandler<dim, spacedim>::get_dof_handler() const
 {
   return agglo_dh;
 }
-
-
 
 template <int dim, int spacedim>
 inline const std::vector<
@@ -981,8 +995,6 @@ AgglomerationHandler<dim, spacedim>::get_slaves_of_idx(
   return master2slaves.at(idx);
 }
 
-
-
 template <int dim, int spacedim>
 template <typename CellIterator>
 inline bool
@@ -992,12 +1004,6 @@ AgglomerationHandler<dim, spacedim>::is_master_cell(
   return master_slave_relationships[cell->global_active_cell_index()] == -1;
 }
 
-
-
-/**
- * Helper function to determine whether or not a cell is a slave cell, without
- * any information about his parents.
- */
 template <int dim, int spacedim>
 template <typename CellIterator>
 inline bool
@@ -1006,8 +1012,6 @@ AgglomerationHandler<dim, spacedim>::is_slave_cell(
 {
   return master_slave_relationships[cell->global_active_cell_index()] >= 0;
 }
-
-
 
 template <int dim, int spacedim>
 inline bool
@@ -1023,7 +1027,6 @@ AgglomerationHandler<dim, spacedim>::at_boundary(
     .first;
 }
 
-
 template <int dim, int spacedim>
 inline unsigned int
 AgglomerationHandler<dim, spacedim>::n_dofs_per_cell() const noexcept
@@ -1031,16 +1034,12 @@ AgglomerationHandler<dim, spacedim>::n_dofs_per_cell() const noexcept
   return fe->n_dofs_per_cell();
 }
 
-
-
 template <int dim, int spacedim>
 inline types::global_dof_index
 AgglomerationHandler<dim, spacedim>::n_dofs() const noexcept
 {
   return agglo_dh.n_dofs();
 }
-
-
 
 template <int dim, int spacedim>
 inline const std::vector<typename Triangulation<dim>::active_face_iterator> &
@@ -1050,8 +1049,6 @@ AgglomerationHandler<dim, spacedim>::polytope_boundary(
   return polygon_boundary[cell];
 }
 
-
-
 template <int dim, int spacedim>
 inline typename Triangulation<dim, spacedim>::active_cell_iterator &
 AgglomerationHandler<dim, spacedim>::is_slave_cell_of(
@@ -1059,8 +1056,6 @@ AgglomerationHandler<dim, spacedim>::is_slave_cell_of(
 {
   return master_slave_relationships_iterators.at(cell->active_cell_index());
 }
-
-
 
 template <int dim, int spacedim>
 inline types::global_cell_index
@@ -1073,8 +1068,6 @@ AgglomerationHandler<dim, spacedim>::get_master_idx_of_cell(
   else
     return static_cast<types::global_cell_index>(idx);
 }
-
-
 
 template <int dim, int spacedim>
 inline bool
@@ -1090,16 +1083,12 @@ AgglomerationHandler<dim, spacedim>::are_cells_agglomerated(
   return (get_master_idx_of_cell(cell) == get_master_idx_of_cell(other_cell));
 }
 
-
-
 template <int dim, int spacedim>
 inline unsigned int
 AgglomerationHandler<dim, spacedim>::n_agglomerates() const
 {
   return n_agglomerations;
 }
-
-
 
 template <int dim, int spacedim>
 inline const typename DoFHandler<dim, spacedim>::active_cell_iterator
@@ -1110,8 +1099,6 @@ AgglomerationHandler<dim, spacedim>::polytope_to_dh_iterator(
     agglo_dh);
 }
 
-
-
 template <int dim, int spacedim>
 AgglomerationIterator<dim, spacedim>
 AgglomerationHandler<dim, spacedim>::begin() const
@@ -1120,8 +1107,6 @@ AgglomerationHandler<dim, spacedim>::begin() const
          ExcMessage("No agglomeration has been performed."));
   return {*master_cells_container.begin(), this};
 }
-
-
 
 template <int dim, int spacedim>
 AgglomerationIterator<dim, spacedim>
@@ -1132,8 +1117,6 @@ AgglomerationHandler<dim, spacedim>::begin()
   return {*master_cells_container.begin(), this};
 }
 
-
-
 template <int dim, int spacedim>
 AgglomerationIterator<dim, spacedim>
 AgglomerationHandler<dim, spacedim>::end() const
@@ -1142,8 +1125,6 @@ AgglomerationHandler<dim, spacedim>::end() const
          ExcMessage("No agglomeration has been performed."));
   return {*master_cells_container.end(), this};
 }
-
-
 
 template <int dim, int spacedim>
 AgglomerationIterator<dim, spacedim>
@@ -1154,8 +1135,6 @@ AgglomerationHandler<dim, spacedim>::end()
   return {*master_cells_container.end(), this};
 }
 
-
-
 template <int dim, int spacedim>
 AgglomerationIterator<dim, spacedim>
 AgglomerationHandler<dim, spacedim>::last()
@@ -1164,8 +1143,6 @@ AgglomerationHandler<dim, spacedim>::last()
          ExcMessage("No agglomeration has been performed."));
   return {master_cells_container.back(), this};
 }
-
-
 
 template <int dim, int spacedim>
 IteratorRange<

@@ -1,16 +1,14 @@
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// SPDX-License-Identifier: LGPL-2.1-or-later
-// Copyright (C) 2001 - 2024 by the deal.II authors
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 1998 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// Part of the source code is dual licensed under Apache-2.0 WITH
-// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
-// governing the source code and code contributions can be found in
-// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef dealii_mapping_box_h
 #define dealii_mapping_box_h
@@ -34,6 +32,10 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
+ * In AggloDGP, the agglomerated complex polytopes are not mapped to reference unit directly.
+ * The bounding box of polytopes are mapped instead. Besides, to agglomerate the standard deal.II cells
+ * into polytopes, bounding box of each cell and each polytope is also needed.
+ * 
  * A class providing a mapping from the reference cell to cells that are
  * axiparallel, i.e., that have the shape of rectangles (in 2d) or
  * boxes (in 3d) with edges parallel to the coordinate directions. The
@@ -79,10 +81,12 @@ template <int dim, int spacedim = dim>
 class MappingBox : public Mapping<dim, spacedim>
 {
 public:
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   MappingBox(const std::vector<BoundingBox<dim>> &local_boxes,
              const std::map<types::global_cell_index, types::global_cell_index>
                &polytope_translator);
-  // for documentation, see the Mapping base class
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
@@ -93,6 +97,9 @@ public:
   virtual bool
   preserves_vertex_locations() const override;
 
+  /**
+   * 
+   */
   virtual bool
   is_compatible_with(const ReferenceCell &reference_cell) const override;
 
@@ -101,19 +108,25 @@ public:
    * @{
    */
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual Point<spacedim>
   transform_unit_to_real_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<dim> &p) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual Point<dim>
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const Point<spacedim> &p) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform_points_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -129,35 +142,45 @@ public:
    * @{
    */
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform(const ArrayView<const Tensor<1, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform(const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform(const ArrayView<const Tensor<2, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform(const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
 
-  // for documentation, see the Mapping base class
+  /** 
+   * documentation can be found in the Mapping base class
+   */
   virtual void
   transform(const ArrayView<const Tensor<3, dim>>                   &input,
             const MappingKind                                        kind,
@@ -197,7 +220,9 @@ public:
      */
     InternalData(const Quadrature<dim> &quadrature);
 
-    // Documentation see Mapping::InternalDataBase.
+    /** 
+     * Documentation can be found in Mapping::InternalDataBase.
+     */
     virtual void
     reinit(const UpdateFlags      update_flags,
            const Quadrature<dim> &quadrature) override;
@@ -240,22 +265,30 @@ public:
   };
 
 private:
-  // documentation can be found in Mapping::requires_update_flags()
+  /** 
+   * documentation can be found in Mapping::requires_update_flags()
+   */
   virtual UpdateFlags
   requires_update_flags(const UpdateFlags update_flags) const override;
 
-  // documentation can be found in Mapping::get_data()
+  /**
+   *  documentation can be found in Mapping::get_data()
+   */
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_data(const UpdateFlags, const Quadrature<dim> &quadrature) const override;
 
   using Mapping<dim, spacedim>::get_face_data;
 
-  // documentation can be found in Mapping::get_subface_data()
+  /** 
+   * documentation can be found in Mapping::get_subface_data()
+   */
   virtual std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
   get_subface_data(const UpdateFlags          flags,
                    const Quadrature<dim - 1> &quadrature) const override;
 
-  // documentation can be found in Mapping::fill_fe_values()
+  /** 
+   * documentation can be found in Mapping::fill_fe_values()
+   */
   virtual CellSimilarity::Similarity
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -267,7 +300,9 @@ private:
 
   using Mapping<dim, spacedim>::fill_fe_face_values;
 
-  // documentation can be found in Mapping::fill_fe_subface_values()
+  /**
+   * documentation can be found in Mapping::fill_fe_subface_values()
+   */
   virtual void
   fill_fe_subface_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
@@ -278,7 +313,9 @@ private:
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
-  // documentation can be found in Mapping::fill_fe_immersed_surface_values()
+  /**
+   * documentation can be found in Mapping::fill_fe_immersed_surface_values()
+   */
   virtual void
   fill_fe_immersed_surface_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
