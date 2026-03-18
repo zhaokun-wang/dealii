@@ -12,20 +12,20 @@
 
 for (deal_II_dimension : DIMENSIONS)
  {
-
-    template class AgglomerationHandler<deal_II_dimension>;
+    template class AgglomerationHandler<deal_II_dimension, deal_II_dimension>;
 
     template void
-    AgglomerationHandler<deal_II_dimension>::create_agglomeration_sparsity_pattern(
+    AgglomerationHandler<deal_II_dimension, deal_II_dimension>::create_agglomeration_sparsity_pattern(
       DynamicSparsityPattern          &,
       const AffineConstraints<double> &,
       const bool                       ,
       const types::subdomain_id        );
 
     template void
-    AgglomerationHandler<deal_II_dimension>::create_agglomeration_sparsity_pattern(
+    AgglomerationHandler<deal_II_dimension, deal_II_dimension>::create_agglomeration_sparsity_pattern(
       TrilinosWrappers::SparsityPattern &,
       const AffineConstraints<double>   &,
       const bool                         ,
       const types::subdomain_id          );
+
  }

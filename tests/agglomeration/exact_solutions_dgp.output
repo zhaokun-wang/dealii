@@ -1,0 +1,9 @@
+
+DEAL::Size of tria: 16
+DEAL::L2 error within tolerance
+DEAL::H1 seminorm within tolerance
+DEAL::Linear: OK
+DEAL::Size of tria: 16
+DEAL::L2 error within tolerance
+DEAL::H1 seminorm within tolerance
+DEAL::Quadratic: OK

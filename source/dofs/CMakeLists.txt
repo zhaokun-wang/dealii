@@ -16,6 +16,7 @@ set(_unity_include_src
   dof_handler.cc
   dof_objects.cc
   number_cache.cc
+  agglomeration_handler.cc
   )
 
 set(_separate_src
@@ -50,7 +51,12 @@ set(_inst
   dof_tools_constraints.inst.in
   dof_tools.inst.in
   dof_tools_sparsity.inst.in
+  agglomeration_handler.inst.in
   )
+
+if(DEAL_II_WITH_AGGLOMERATION)
+    add_definitions(-DDEAL_II_WITH_AGGLOMERATION)
+endif()
 
 file(GLOB _header CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h

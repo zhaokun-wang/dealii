@@ -348,7 +348,7 @@ unset(ENV{NVCCFLAGS})
 
 option(DEAL_II_WITH_AGGLOMERATION
   "If set to ON, then enable support for Polytope Agglomeration methods"
-  OFF
+  ON
   )
 list(APPEND DEAL_II_FEATURES AGGLOMERATION)
 

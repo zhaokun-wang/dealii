@@ -1,0 +1,4 @@
+
+DEAL::Running with 3 MPI ranks.
+DEAL::Test with f(x,y)=x: 1.00000
+DEAL::Test with f(x,y)=x+y: 2.00000

@@ -14,8 +14,8 @@
 #define agglomeration_iterator_h
 
 
-#include <agglomeration_accessor.h>
-
+#include <deal.II/dofs/agglomeration_accessor.h>
+#include <deal.II/grid/cell_id.h>
 
 /**
  * A class that is used to iterate over polygons. Together with the

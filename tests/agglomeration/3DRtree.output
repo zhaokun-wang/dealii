@@ -1,0 +1,5 @@
+
+DEAL::Size of tria: 3584
+DEAL::Total number of available levels: 3
+DEAL::N subdomains = 56
+DEAL::Successfully create 56 agglomerates in 3D using R-Tree based on rtree generated grid.

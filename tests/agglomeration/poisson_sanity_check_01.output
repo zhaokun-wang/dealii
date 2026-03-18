@@ -1,0 +1,5 @@
+
+DEAL::N subdomains: 50
+DEAL::Test with f(x,y)=x:1.00000
+DEAL::Test with f(x,y)=x+y:2.00000
+DEAL::Test with 1: -3.92221e-15

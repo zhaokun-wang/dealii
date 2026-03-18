@@ -14,6 +14,7 @@ set(_unity_include_src
   block_mask.cc
   component_mask.cc
   fe_abf.cc
+  fe_agglodgp.cc
   fe_bernardi_raugel.cc
   fe_bdm.cc
   fe.cc
@@ -54,6 +55,7 @@ set(_unity_include_src
   fe_trace.cc
   fe_values_extractors.cc
   fe_wedge_p.cc
+  mapping_box.cc
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
@@ -80,13 +82,6 @@ set(_separate_src
   mapping_q_eulerian.cc
   )
 
-if(DEAL_II_WITH_AGGLOMERATION)
-  list(APPEND _unity_include_src
-    fe_agglodgp.cc
-    mapping_box.cc
-  )
-endif()
-
 # determined by profiling
 set(_n_includes_per_unity_file 10)
 
@@ -98,6 +93,7 @@ setup_source_list("${_unity_include_src}"
 
 set(_inst
   fe_abf.inst.in
+  fe_agglodgp.inst.in
   fe_bdm.inst.in
   fe_bernstein.inst.in
   fe_dgp.inst.in
@@ -140,6 +136,7 @@ set(_inst
   fe_values_views_internal.inst.in
   fe_values.inst.in
   fe_wedge_p.inst.in
+  mapping_box.inst.in
   mapping_c1.inst.in
   mapping_cartesian.inst.in
   mapping.inst.in
@@ -156,10 +153,7 @@ set(_inst
   )
 
 if(DEAL_II_WITH_AGGLOMERATION)
-  list(APPEND _inst
-    fe_agglodgp.inst.in
-    mapping_box.inst.in
-  )
+    add_definitions(-DDEAL_II_WITH_AGGLOMERATION)
 endif()
 
 file(GLOB _header CONFIGURE_DEPENDS

@@ -16,7 +16,7 @@
 
 #include <deal.II/lac/sparsity_tools.h>
 
-#include <deal.II/grid/agglomeration_handler.h>
+#include <deal.II/dofs/agglomeration_handler.h>
 #include <deal.II/fe/fe_agglodgp.h>
 
 template <int dim, int spacedim>
@@ -1295,10 +1295,11 @@ namespace dealii
 
 
   } // namespace internal
+
 } // namespace dealii
 
 
-#include "grid/agglomeration_handler.inst"
+#include "dofs/agglomeration_handler.inst"
 /*template class AgglomerationHandler<1>;
 template void
 AgglomerationHandler<1>::create_agglomeration_sparsity_pattern(

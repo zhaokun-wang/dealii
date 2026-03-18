@@ -12,5 +12,5 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
-    template class MappingBox<deal_II_dimension>;
+    template class MappingBox<deal_II_dimension, deal_II_dimension>;
   }

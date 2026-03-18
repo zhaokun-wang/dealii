@@ -20,6 +20,7 @@
 #include <deal.II/base/iterator_range.h>
 
 #include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/cell_id.h>
 
 #include <vector>
 
@@ -98,7 +99,7 @@ public:
   /**
    * Return a vector of face iterators describing the boundary of agglomerate.
    */
-  const std::vector<typename Triangulation<dim>::active_face_iterator> &
+  const std::vector<typename Triangulation<dim, spacedim>::active_face_iterator> &
   polytope_boundary() const;
 
   /**
@@ -551,7 +552,7 @@ AgglomerationAccessor<dim, spacedim>::get_agglomerate() const
 
 
 template <int dim, int spacedim>
-inline const std::vector<typename Triangulation<dim>::active_face_iterator> &
+inline const std::vector<typename Triangulation<dim, spacedim>::active_face_iterator> &
 AgglomerationAccessor<dim, spacedim>::polytope_boundary() const
 {
   return handler->polygon_boundary[master_cell];
